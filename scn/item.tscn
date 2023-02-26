@@ -13,6 +13,8 @@ var inside_area = false
 
 var target = null
 
+var time: float
+
 onready var collider   := $CollisionShape2D
 onready var sprite     := $Sprite
 onready var bigsprite  := $BigSprite
@@ -23,7 +25,8 @@ const SUCTION_FORCE = 20000
 
 func _ready() -> void:
 	suction_area = get_node(\"../../Player/Vacuum/SuctionArea\")
-	var r := randi() % 100
+	var r := randi() % 100 - min(time, 60)
+	print(time)
 	
 	if r < 10:
 		score = -1

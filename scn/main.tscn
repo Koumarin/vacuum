@@ -90,16 +90,22 @@ export var cooldown: float
 
 export var Item: PackedScene
 
+var total_time := 0.0
+
 onready var _time := cooldown
 
 onready var SuctionArea := $'%SuctionArea'
 onready var Player := $'%Player'
 
+func _ready() -> void:
+	randomize()
+
 func _process(dt: float) -> void:
 	_time -= dt
 	if _time <= 0:
-		_time = cooldown
+		_time = cooldown - min(total_time / 100, 1.8)
 		spawn()
+	total_time += dt
 
 func spawn() -> void:
 	var item = Item.instance()
@@ -110,6 +116,8 @@ func spawn() -> void:
 	
 	SuctionArea.connect('body_entered', item, '_on_SuctionArea_body_entered', [Player])
 	SuctionArea.connect('body_exited',  item, '_on_SuctionArea_body_exited')
+	
+	item.time = total_time / 10
 	
 	add_child(item)
 	
@@ -213,7 +221,7 @@ shape = SubResource( 13 )
 
 [node name="Spawner" type="Node" parent="."]
 script = SubResource( 5 )
-cooldown = 1.0
+cooldown = 2.0
 Item = ExtResource( 2 )
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
