@@ -1,20 +1,56 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [sub_resource type="GDScript" id=2]
-script/source = "extends RigidBody2D
+script/source = "extends KinematicBody2D
+
+var score := 0
 
 onready var collider := $CollisionShape2D
+onready var sprite   := $Sprite
+
+func _ready() -> void:
+	var r := randi() % 100
+	
+	if r < 10:
+		score = -1
+	elif r < 20:
+		score = 100
+	else:
+		score = 10
+	
+	match score:
+		-1:  sprite.modulate = Color(1, 0, 0)
+		10:  sprite.modulate = Color(0, 0, 1)
+		100: sprite.modulate = Color(0, 1, 0)
+
+func _physics_process(dt: float) -> void:
+	position += dt * Vector2(0, 100)
 
 func get_size() -> float:
 	return collider.shape.extents.x
+
+func is_bomb() -> bool:
+	return score < 0
 "
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 32, 32 )
 
-[node name="Item" type="RigidBody2D"]
+[sub_resource type="OpenSimplexNoise" id=3]
+
+[sub_resource type="NoiseTexture" id=4]
+width = 32
+height = 32
+noise = SubResource( 3 )
+
+[node name="Item" type="KinematicBody2D"]
 collision_layer = 4
 script = SubResource( 2 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="."]
+position = Vector2( -9.53674e-07, 9.53674e-07 )
+scale = Vector2( 2, 2 )
+texture = SubResource( 4 )
