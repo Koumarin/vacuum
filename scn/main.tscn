@@ -64,11 +64,9 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed('activate'):
 		monitoring              = true
 		suction_area.monitoring = true
-		suction_sprite.visible  = true
 	elif event.is_action_released('activate'):
 		monitoring              = false
 		suction_area.monitoring = false
-		suction_sprite.visible  = false
 "
 
 [sub_resource type="RectangleShape2D" id=3]
