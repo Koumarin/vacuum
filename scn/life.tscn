@@ -1,11 +1,11 @@
 [gd_scene load_steps=2 format=2]
 
-[ext_resource path="res://icon.png" type="Texture" id=1]
+[ext_resource path="res://dat/hearth.png" type="Texture" id=1]
 
 [node name="Life" type="TextureRect"]
-anchor_right = 0.016
-anchor_bottom = 0.027
-margin_right = 47.616
-margin_bottom = 47.8
+anchor_right = 0.012
+anchor_bottom = 0.022
+margin_right = 37.712
+margin_bottom = 37.328
 rect_scale = Vector2( 0.25, 0.25 )
 texture = ExtResource( 1 )
