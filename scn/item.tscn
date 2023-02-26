@@ -4,11 +4,17 @@
 script/source = "extends KinematicBody2D
 
 var score := 0
+var suction_area
+var inside_area = false
 
 onready var collider := $CollisionShape2D
 onready var sprite   := $Sprite
 
+const SUCTION_FORCE = 2000
+const SUCTION_DISTANCE = 100
+
 func _ready() -> void:
+	suction_area = get_node(\"../../Player/Vacuum/SuctionArea\")
 	var r := randi() % 100
 	
 	if r < 10:
@@ -24,13 +30,35 @@ func _ready() -> void:
 		100: sprite.modulate = Color(0, 1, 0)
 
 func _physics_process(dt: float) -> void:
-	position += dt * Vector2(0, 100)
+	var delta = get_process_delta_time()
+	if inside_area:
+		# Calculate the direction from the player to the suction area
+		var direction = suction_area.global_position - self.global_position
+
+		# Check if the player is within the suction distance
+		if direction.length() < SUCTION_DISTANCE:
+			# Calculate the suction force
+			var suction_force = direction.normalized() * SUCTION_FORCE
+
+			# Apply the suction force to the player
+			self.move_and_collide(suction_force * delta)
+	else:
+		position += dt * Vector2(0, 100)
 
 func get_size() -> float:
 	return collider.shape.extents.x
 
 func is_bomb() -> bool:
 	return score < 0
+
+func _on_SuctionArea_body_entered(body):
+	if body == self:
+		inside_area = true
+		print(\"teste\")
+
+func _on_SuctionArea_body_exited(body):
+	if body == self:
+		inside_area = false
 "
 
 [sub_resource type="RectangleShape2D" id=1]
