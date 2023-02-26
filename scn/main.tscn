@@ -5,26 +5,6 @@
 [ext_resource path="res://dat/pixil-frame-0.png" type="Texture" id=3]
 [ext_resource path="res://scn/life.tscn" type="PackedScene" id=4]
 
-[sub_resource type="GDScript" id=6]
-script/source = "extends Label
-
-func _on_Player_score_update(new_score) -> void:
-	text = 'Score: ' + str(new_score)
-"
-
-[sub_resource type="GDScript" id=8]
-script/source = "extends HBoxContainer
-
-export var Life: PackedScene
-
-func _ready() -> void:
-	for i in range(3):
-		add_child(Life.instance())
-
-func _on_Player_health_update(new_health) -> void:
-	remove_child(get_child(0))
-"
-
 [sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
 
@@ -73,17 +53,17 @@ script/source = "extends Area2D
 
 export var force: float
 
-onready var suction_area := $SuctionArea 
+onready var suction_area := $SuctionArea
 
 func _process(_dt: float) -> void:
 	look_at(get_global_mouse_position())
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed('activate'):
-		monitoring           = true
+		monitoring              = true
 		suction_area.monitoring = true
 	elif event.is_action_released('activate'):
-		monitoring           = false
+		monitoring              = false
 		suction_area.monitoring = false
 "
 
@@ -102,15 +82,21 @@ export var Item: PackedScene
 
 onready var _time := cooldown
 
+onready var SuctionArea := $'%SuctionArea'
+onready var Player := $'%Player'
+
 func _process(dt: float) -> void:
 	_time -= dt
 	if _time <= 0:
 		_time = cooldown
 		spawn()
-	
+
 func spawn() -> void:
 	var item = Item.instance()
 	var size: float
+	
+	SuctionArea.connect('body_entered', item, '_on_SuctionArea_body_entered', [Player])
+	SuctionArea.connect('body_exited',  item, '_on_SuctionArea_body_exited')
 	
 	add_child(item)
 	
@@ -119,26 +105,30 @@ func spawn() -> void:
 	item.position.x = rand_range(2 * size, OS.get_screen_size().x - 2 * size)
 "
 
+[sub_resource type="GDScript" id=6]
+script/source = "extends Label
+
+func _on_Player_score_update(new_score) -> void:
+	text = 'Score: ' + str(new_score)
+"
+
+[sub_resource type="GDScript" id=8]
+script/source = "extends HBoxContainer
+
+export var Life: PackedScene
+
+func _ready() -> void:
+	for i in range(3):
+		add_child(Life.instance())
+
+func _on_Player_health_update(new_health) -> void:
+	remove_child(get_child(0))
+"
+
 [node name="Main" type="Node"]
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-margin_right = 40.0
-margin_bottom = 40.0
-
-[node name="Score" type="Label" parent="VBoxContainer"]
-margin_right = 51.0
-margin_bottom = 14.0
-text = "Score: 0"
-script = SubResource( 6 )
-
-[node name="Life" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 18.0
-margin_right = 51.0
-margin_bottom = 18.0
-script = SubResource( 8 )
-Life = ExtResource( 4 )
-
 [node name="Player" type="KinematicBody2D" parent="."]
+unique_name_in_owner = true
 position = Vector2( 544, 544 )
 collision_mask = 0
 script = SubResource( 1 )
@@ -166,17 +156,18 @@ position = Vector2( 64, 0 )
 shape = SubResource( 3 )
 
 [node name="SuctionArea" type="Area2D" parent="Player/Vacuum"]
-position = Vector2( -109, -73 )
+unique_name_in_owner = true
+position = Vector2( 0, 1 )
 collision_layer = 0
 collision_mask = 4
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Vacuum/SuctionArea"]
-position = Vector2( 389, 74 )
+position = Vector2( 275, 0 )
 shape = SubResource( 9 )
 
 [node name="Sprite" type="Sprite" parent="Player/Vacuum/SuctionArea"]
-position = Vector2( 390, 73 )
+position = Vector2( 276, -1 )
 scale = Vector2( 5.375, 1 )
 texture = ExtResource( 1 )
 
@@ -185,10 +176,23 @@ script = SubResource( 5 )
 cooldown = 1.0
 Item = ExtResource( 2 )
 
-[node name="Item" parent="Spawner" instance=ExtResource( 2 )]
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Score" type="Label" parent="VBoxContainer"]
+margin_right = 51.0
+margin_bottom = 14.0
+text = "Score: 0"
+script = SubResource( 6 )
+
+[node name="Life" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 18.0
+margin_right = 51.0
+margin_bottom = 18.0
+script = SubResource( 8 )
+Life = ExtResource( 4 )
 
 [connection signal="health_update" from="Player" to="VBoxContainer/Life" method="_on_Player_health_update"]
 [connection signal="score_update" from="Player" to="VBoxContainer/Score" method="_on_Player_score_update"]
 [connection signal="body_entered" from="Player/Vacuum" to="Player" method="_on_Vacuum_body_entered"]
-[connection signal="body_entered" from="Player/Vacuum/SuctionArea" to="Spawner/Item" method="_on_SuctionArea_body_entered"]
-[connection signal="body_exited" from="Player/Vacuum/SuctionArea" to="Spawner/Item" method="_on_SuctionArea_body_exited"]
