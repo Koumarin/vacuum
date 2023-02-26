@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://icon.png" type="Texture" id=1]
+[ext_resource path="res://scn/item.tscn" type="PackedScene" id=2]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
@@ -35,6 +36,32 @@ func _process(_dt: float) -> void:
 [sub_resource type="RectangleShape2D" id=3]
 extents = Vector2( 32, 32 )
 
+[sub_resource type="GDScript" id=5]
+script/source = "extends Node
+
+export var cooldown: float
+
+export var Item: PackedScene
+
+onready var _time := cooldown
+
+func _process(dt: float) -> void:
+	_time -= dt
+	if _time <= 0:
+		_time = cooldown
+		spawn()
+
+func spawn() -> void:
+	var item = Item.instance()
+	var size: float
+	
+	add_child(item)
+	
+	size = item.get_size()
+	item.position.y = -size
+	item.position.x = rand_range(2 * size, OS.get_screen_size().x - 2 * size)
+"
+
 [node name="Main" type="Node"]
 
 [node name="Player" type="KinematicBody2D" parent="."]
@@ -57,3 +84,8 @@ script = SubResource( 4 )
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Vacuum"]
 position = Vector2( 64, 0 )
 shape = SubResource( 3 )
+
+[node name="Spawner" type="Node" parent="."]
+script = SubResource( 5 )
+cooldown = 1.0
+Item = ExtResource( 2 )

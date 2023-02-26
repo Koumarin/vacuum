@@ -1,0 +1,21 @@
+[gd_scene load_steps=3 format=2]
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends RigidBody2D
+
+onready var collider := $CollisionShape2D
+
+func get_size() -> float:
+	return collider.shape.extents.x
+"
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 32, 32 )
+
+[node name="Item" type="RigidBody2D"]
+collision_layer = 4
+collision_mask = 3
+script = SubResource( 2 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource( 1 )
