@@ -1,9 +1,10 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=14 format=2]
 
 [ext_resource path="res://icon.png" type="Texture" id=1]
 [ext_resource path="res://scn/item.tscn" type="PackedScene" id=2]
-[ext_resource path="res://dat/pixil-frame-0.png" type="Texture" id=3]
+[ext_resource path="res://dat/t1.png" type="Texture" id=3]
 [ext_resource path="res://scn/life.tscn" type="PackedScene" id=4]
+[ext_resource path="res://dat/bc.png" type="Texture" id=5]
 
 [sub_resource type="GDScript" id=1]
 script/source = "extends KinematicBody2D
@@ -126,6 +127,12 @@ func _on_Player_health_update(new_health) -> void:
 "
 
 [node name="Main" type="Node"]
+
+[node name="TextureRect" type="TextureRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+texture = ExtResource( 5 )
 
 [node name="Player" type="KinematicBody2D" parent="."]
 unique_name_in_owner = true
