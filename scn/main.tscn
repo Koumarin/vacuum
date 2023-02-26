@@ -54,7 +54,8 @@ script/source = "extends Area2D
 
 export var force: float
 
-onready var suction_area := $SuctionArea
+onready var suction_area   := $SuctionArea
+onready var suction_sprite := $SuctionArea/Sprite
 
 func _process(_dt: float) -> void:
 	look_at(get_global_mouse_position())
@@ -63,9 +64,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed('activate'):
 		monitoring              = true
 		suction_area.monitoring = true
+		suction_sprite.visible  = true
 	elif event.is_action_released('activate'):
 		monitoring              = false
 		suction_area.monitoring = false
+		suction_sprite.visible  = false
 "
 
 [sub_resource type="RectangleShape2D" id=3]
@@ -186,6 +189,7 @@ position = Vector2( 275, 0 )
 shape = SubResource( 9 )
 
 [node name="Sprite" type="Sprite" parent="Player/Vacuum/SuctionArea"]
+visible = false
 position = Vector2( 276, -1 )
 scale = Vector2( 5.375, 1 )
 texture = ExtResource( 1 )
